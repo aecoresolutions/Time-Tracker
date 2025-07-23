@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Active Time Tracker</title>
-    <link href="style.css" />
-    <script scr="script.js"> </script>
+    <link href="style.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" scr="script.js"></script>
     <style>
         body {
             text-align: center;
@@ -17,7 +17,7 @@
     <h1>Time spent with page open:</h1>
     <p id="time">0 Sec</p>
 </body>
-<script scr="script.js"> </script>
+<script type="text/javascript" scr="script.js"> </script>
 <script>
     let totalTime = parseInt(localStorage.getItem("activeTime")) || 0;
     let lastDate = localStorage.getItem("lastDate") || getTodayDate();
