@@ -1,43 +1,52 @@
-const RESET_INTERVAL = 24 * 60 * 60 * 1000; 
-
 let totalTime = parseInt(localStorage.getItem("activeTime")) || 0;
-let lastResetTime = parseInt(localStorage.getItem("lastResetTime")) || Date.now();
+    let lastDate = localStorage.getItem("lastDate") || getTodayDate();
+    let timerInterval;
 
+   
+    function formatTime(ms) {
+      const totalSeconds = Math.floor(ms / 1000);
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
 
-if (Date.now() - lastResetTime >= RESET_INTERVAL) {
-    totalTime = 0;
-    lastResetTime = Date.now();
-    localStorage.setItem("activeTime", totalTime);
-    localStorage.setItem("lastResetTime", lastResetTime);
-}
+      let parts = [];
+      if (hours > 0) parts.push(`${hours} H`);
+      if (minutes > 0 || hours > 0) parts.push(`${minutes} Min`);
+      parts.push(`${seconds} Sec`);
+      return parts.join(" : ");
+    }
 
-function formatTime(ms) {
-    const totalSeconds = Math.floor(ms / 1000);
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = totalSeconds % 60;
+    
+    function getTodayDate() {
+      const now = new Date();
+      return now.toISOString().split('T')[0];
+    }
 
-    let parts = [];
-    if (hours > 0) parts.push(`${hours} H`);
-    if (minutes > 0 || hours > 0) parts.push(`${minutes} Min`);
-    parts.push(`${seconds} Sec`);
+ 
+    function updateTime() {
+      const currentDate = getTodayDate();
 
-    return parts.join(" : ");
-}
+      
+      if (currentDate !== lastDate) {
+        totalTime = 0;
+        lastDate = currentDate;
+        localStorage.setItem("lastDate", lastDate);
+      }
 
-function updateTime() {
-    totalTime += 1000;
-    localStorage.setItem("activeTime", totalTime);
-    localStorage.setItem("lastResetTime", lastResetTime);
-    document.getElementById("time").innerText = formatTime(totalTime);
-}
+      totalTime += 1000;
+      localStorage.setItem("activeTime", totalTime);
+      document.getElementById("time").innerText = formatTime(totalTime);
+    }
 
-window.addEventListener("load", () => {
-    document.getElementById("time").innerText = formatTime(totalTime);
-    setInterval(updateTime, 1000);
-});
+  
+    window.addEventListener("load", () => {
+      document.getElementById("time").innerText = formatTime(totalTime);
+      timerInterval = setInterval(updateTime, 1000);
+    });
 
-window.addEventListener("beforeunload", () => {
-    localStorage.setItem("activeTime", totalTime);
-    localStorage.setItem("lastResetTime", lastResetTime);
-});
+   
+    window.addEventListener("beforeunload", () => {
+      clearInterval(timerInterval);
+      localStorage.setItem("activeTime", totalTime);
+      localStorage.setItem("lastDate", lastDate);
+    });
